@@ -101,7 +101,7 @@ free and works with any normal Gmail account.
 ```
 GMAIL_ADDRESS=you@gmail.com
 GMAIL_APP_PASSWORD=abcdefghijklmnop
-SENDER_NAME=Aditya Rehpade
+SENDER_NAME=Your Name
 ```
 
 Your normal Gmail password will **not** work — Google blocks it for SMTP.
