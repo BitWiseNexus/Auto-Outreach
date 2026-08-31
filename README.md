@@ -72,6 +72,18 @@ GROQ_MODEL=llama-3.3-70b-versatile
 The free tier has no card requirement; it is rate-limited per minute/day, which
 this tool handles with backoff and a fallback.
 
+**Groq retires models often.** If a run fails with `model_not_found`, ask your
+key what it can reach and paste one of those names into `.env`:
+
+```bash
+python main.py --list-models
+```
+
+The free tier is also limited on *tokens per minute* (8,000 at the time of
+writing), so a long `--dry-run` will hit 429s. That is harmless — the tool backs
+off, and falls over to Gemini if Groq stays busy. In `--send` mode the 45–60s
+delay between contacts keeps you well under the limit anyway.
+
 ## 3. Get a free Gemini API key (fallback LLM)
 
 1. Go to <https://aistudio.google.com/apikey> and sign in with a Google account.
@@ -154,6 +166,7 @@ python main.py --send --yes               # skip the confirmation prompt
 | `--daily-cap N` | Override the per-day send cap |
 | `--resend` | Don't skip contacts already marked SENT |
 | `--verbose` | Print each generated email to the console |
+| `--list-models` | List the models your keys can actually use, then exit |
 
 ---
 
@@ -229,6 +242,9 @@ outgrow ~40 emails/day, that's the module to swap.
 | Symptom | Fix |
 |---|---|
 | `No LLM key configured` | Fill `GROQ_API_KEY` and/or `GEMINI_API_KEY` in `.env` |
+| `model_not_found` / HTTP 404 | The model was retired. Run `python main.py --list-models` and put a listed name in `.env` |
+| Lots of `429 ... tokens per minute` | Free-tier throttling. Harmless: it backs off and falls back to Gemini |
+| `Gemini hit maxOutputTokens` | A thinking model spent the budget reasoning; use a `-flash` model or raise `maxOutputTokens` in [llm.py](llm.py) |
 | `Gmail rejected the login` | Use a 16-char **App Password**, not your Gmail password; check 2FA is on |
 | `Missing GMAIL_ADDRESS...` | Fill the Gmail section of `.env` (only needed for `--send` / `--test`) |
 | `Daily cap reached` | Expected — rerun tomorrow, or raise `--daily-cap` |

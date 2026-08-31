@@ -117,6 +117,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         help="Skip the confirmation prompt before a real send.",
     )
     parser.add_argument("--verbose", "-v", action="store_true", help="Debug logging.")
+    parser.add_argument(
+        "--list-models",
+        action="store_true",
+        help="List the models your API keys can actually use, then exit. "
+        "Use this when a run fails with model_not_found.",
+    )
 
     args = parser.parse_args(argv)
     if not (args.send or args.test):
@@ -186,6 +192,33 @@ def select_contacts(
     if args.limit is not None:
         selected = selected[: max(0, args.limit)]
     return selected
+
+
+def list_models(settings: Settings) -> int:
+    """Print the models each configured key can reach, marking the one in .env."""
+    import requests
+
+    checks = (
+        ("Groq", settings.groq_api_key, settings.groq_model, llm.list_groq_models),
+        ("Gemini", settings.gemini_api_key, settings.gemini_model, llm.list_gemini_models),
+    )
+    for label, key, configured, lister in checks:
+        print(f"\n=== {label} ===")
+        if not key:
+            print("  (no API key set in .env -- skipped)")
+            continue
+        try:
+            models = lister(settings)
+        except requests.RequestException as exc:
+            print(f"  could not list models: {exc}")
+            continue
+        for m in models:
+            print(f"  {'* ' if m == configured else '  '}{m}")
+        if configured not in models:
+            print(f"\n  !! Your configured model {configured!r} is NOT in this list.")
+            print(f"     Pick one above and set it in .env.")
+    print("\n(* = the model currently set in .env)")
+    return 0
 
 
 def preview(subject: str, body: str, indent: str = "    ") -> str:
@@ -426,6 +459,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"Configuration error: {exc}", file=sys.stderr)
         return 2
     apply_overrides(settings, args)
+
+    if args.list_models:
+        try:
+            settings.require_llm()
+        except ConfigError as exc:
+            print(f"{exc}", file=sys.stderr)
+            return 2
+        return list_models(settings)
 
     log_path = setup_logging(settings.log_dir, args.verbose)
     log = LOG

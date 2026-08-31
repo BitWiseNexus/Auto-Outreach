@@ -122,6 +122,10 @@ class Profile:
             "Full-stack skills: " + ", ".join(self.skills.get("full_stack", [])),
             "GenAI / LLM skills: " + ", ".join(self.skills.get("genai", [])),
             f"Looking for: {self.looking_for}",
+            "IMPORTANT: the skills above are general skills. This fact sheet "
+            "does NOT record which skills were used at which employer, so you "
+            "must not connect any skill to any company, and must not describe "
+            "what was built at any internship.",
         ]
         return "\n".join(f"- {ln}" for ln in lines if ln.strip(" -"))
 
@@ -173,9 +177,11 @@ class Settings:
             delay_min, delay_max = delay_max, delay_min
         return cls(
             groq_api_key=_env("GROQ_API_KEY"),
-            groq_model=_env("GROQ_MODEL") or "llama-3.3-70b-versatile",
+            # Providers retire models; `python main.py --list-models` shows
+            # what the configured keys can actually reach today.
+            groq_model=_env("GROQ_MODEL") or "openai/gpt-oss-120b",
             gemini_api_key=_env("GEMINI_API_KEY"),
-            gemini_model=_env("GEMINI_MODEL") or "gemini-2.0-flash",
+            gemini_model=_env("GEMINI_MODEL") or "gemini-2.5-flash",
             gmail_address=gmail,
             # Gmail shows App Passwords as "abcd efgh ijkl mnop"; spaces are noise.
             gmail_app_password=_env("GMAIL_APP_PASSWORD").replace(" ", ""),
