@@ -1,0 +1,25 @@
+# --- Secrets ---------------------------------------------------------------
+.env
+
+# --- Personal data (never commit) ------------------------------------------
+# Your own profile facts and your contact list.
+# The committed templates are .env.example and the column list in the README.
+profile.json
+companies.csv
+contacts.csv
+
+# --- Generated output ------------------------------------------------------
+# outbox/ = dry-run drafts, logs/ = per-run logs, sent_log.csv = send history
+outbox/
+logs/
+sent_log.csv
+
+# Any other contact/export CSV dropped in the project root
+*.csv
+
+# --- Python ----------------------------------------------------------------
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo

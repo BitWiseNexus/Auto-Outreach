@@ -187,11 +187,18 @@ should stay far below that — 40/day is a deliberately conservative default.
 | [llm.py](llm.py) | Prompting, Groq → Gemini fallback, retry/backoff, output sanitising |
 | [mailer.py](mailer.py) | Gmail SMTP, address validation, message building |
 | [tracker.py](tracker.py) | CSV loading, `sent_log.csv` read/write, daily-cap counting |
-| [profile.json](profile.json) | The only facts the LLM may use about you — edit freely |
 | [.env.example](.env.example) | Every setting, documented; copy to `.env` |
+| `profile.json` | The only facts the LLM may use about you — edit freely (git-ignored) |
+| `companies.csv` | Your contact list (git-ignored) |
 | `outbox/` | Dry-run output (git-ignored) |
 | `logs/` | Per-run logs (git-ignored) |
 | `sent_log.csv` | Send history: Email, Status, SentAt, Subject, Provider, Error (git-ignored) |
+
+`.env`, `profile.json` and every `.csv` are git-ignored: they hold your keys, your
+personal details and other people's contact details, so none of them should ever
+reach a public repo. If you clone this somewhere fresh, recreate `profile.json`
+using the keys listed above and drop your CSV in with the columns from the top of
+this README.
 
 Editing your background, links or target roles is a `profile.json` change — no
 prompt text needs touching. Tone and structure rules live in `SYSTEM_PROMPT` in

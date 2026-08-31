@@ -1,0 +1,5 @@
+# AutoOutreach dependencies -- all free and open source.
+# Email sending uses Python's stdlib smtplib, so there is no mail-service SDK
+# (and no paid transactional-email provider) in this list.
+requests>=2.31.0        # HTTP calls to the Groq and Gemini free-tier APIs
+python-dotenv>=1.0.1    # loads .env
